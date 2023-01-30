@@ -59,3 +59,32 @@ function animate() {
 }
 
 animate();
+
+//end of Player script
+//------------------------------------------------------------
+//begin eventlisnters
+
+//*addEventListener to listen for a keydown event mainly KeyD, KeyA and Space
+window.addEventListener("keydown", ({ keyCode }) => {
+  switch (keyCode) {
+    //*chekcs if KeyA has been pressed
+    case 65:
+      console.log("this is left");
+      break;
+    //*chekcs if KeyD has been pressed
+    case 68:
+      console.log("this is right");
+      
+      break;
+    //*chekcs if KeyS has been pressed
+    case 32:
+      console.log("this is up");
+      //*gives Player a upwards velocity
+      player.velocity.y -= 20;
+      break;
+    //*chekcs if Space has been pressed
+    case 83:
+      console.log("this is down");
+      break;
+  }
+});
