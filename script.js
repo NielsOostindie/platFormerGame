@@ -37,6 +37,7 @@ class Player {
     this.draw();
     //!adds the gravity(velocity.y) the the y postion of the Player
     this.postion.y += this.velocity.y;
+    this.postion.x += this.velocity.x;
     //*monitoring the bottom of Player
     if (this.postion.y + this.height + this.velocity.y <= canvas.height)
       //*makes the gravity accelerate over time
@@ -70,21 +71,48 @@ window.addEventListener("keydown", ({ keyCode }) => {
     //*chekcs if KeyA has been pressed
     case 65:
       console.log("this is left");
+      //*gives Player a sidewards velocity
+      player.velocity.x = -3;
       break;
     //*chekcs if KeyD has been pressed
     case 68:
       console.log("this is right");
-      
+      //*gives Player a sidewards velocity
+      player.velocity.x = 3;
       break;
-    //*chekcs if KeyS has been pressed
+    //*chekcs if Space has been pressed
     case 32:
       console.log("this is up");
       //*gives Player a upwards velocity
       player.velocity.y -= 20;
       break;
-    //*chekcs if Space has been pressed
+    //*chekcs if KeyS has been pressed
     case 83:
       console.log("this is down");
       break;
   }
 });
+
+
+//*addEventListener to listen for a keyup event mainly KeyD, KeyA and Space
+window.addEventListener("keyup", ({ keyCode }) => {
+    switch (keyCode) {
+      //*chekcs if KeyA has been lifted
+      case 65:
+        console.log("this is left");
+         //*makes the Player stop moving
+        player.velocity.x = 0;
+        break;
+      //*chekcs if KeyD has been lifted
+      case 68:
+        console.log("this is right");
+        //*makes the Player stop moving
+        player.velocity.x = 0;
+        break;
+      //*chekcs if KeyS has been lifted
+      case 83:
+        console.log("this is down");
+        //*makes the Player stop moving
+        break;
+    }
+  });
