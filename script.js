@@ -15,7 +15,7 @@ class Player {
   constructor() {
     //!give the Player a x, y, width and height
     this.postion = {
-      x: 100,
+      x: 250,
       y: 100,
     };
     //!Give the Player gravity
@@ -48,8 +48,34 @@ class Player {
   }
 }
 
+class Platform {
+    constructor() {
+        this.postion = {
+            x: 600,
+            y: 750
+        }
+
+        this.width = 200;
+        this.height = 30;
+    }
+
+    draw() {
+        c.fillStyle = 'blue';
+        c.fillRect(this.postion.x, this.postion.y, this.width, this.height);
+    }
+}
+
 const player = new Player();
-player.draw();
+const platform = new Platform();
+//!define the keys we want to monitor
+const keys = {
+  right: {
+    pressed: false,
+  },
+  left: {
+    pressed: false,
+  },
+};
 
 function animate() {
   //*insert an argument that we want to loop
@@ -57,6 +83,39 @@ function animate() {
   //!clears the whole canvas
   c.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
+  platform.draw();
+
+  //?checks if Player has pressed the right or left key and
+  //?move acordingly
+  //*if the Player x axis has had the hav way mark stop moving
+  if (keys.right.pressed && player.postion.x < window.innerWidth / 2) {
+    player.velocity.x = 5;
+  } else if (keys.left.pressed && player.postion.x > 200) {
+    player.velocity.x = -5;
+  } else {player.velocity.x = 0;
+    if (keys.right.pressed){
+        platform.postion.x -= 5
+    }
+    if (keys.left.pressed){
+        platform.postion.x += 5
+    }
+  }
+
+  //*platform collision detection
+  if (player.postion.y + player.height <= platform.postion.y &&
+     player.postion.y + player.height + player.velocity.y >=  platform.postion.y &&
+     player.postion.x + player.width >= platform.postion.x &&  player.postion.x <= platform.postion.x + platform.width){
+    player.velocity.y = 0
+  }
+
+  if (platform.postion.y + platform.height >= player.postion.y &&
+    platform.postion.y <= player.postion.y + player.height  && 
+    platform.postion.x + platform.width >= player.postion.x &&
+      platform.postion.x <= player.postion.x + player.width){
+    player.velocity.y = 0
+    player.velocity.y = 1
+  }
+
 }
 
 animate();
@@ -70,49 +129,44 @@ window.addEventListener("keydown", ({ keyCode }) => {
   switch (keyCode) {
     //*chekcs if KeyA has been pressed
     case 65:
-      console.log("this is left");
-      //*gives Player a sidewards velocity
-      player.velocity.x = -3;
+      keys.left.pressed = true;
       break;
     //*chekcs if KeyD has been pressed
     case 68:
-      console.log("this is right");
-      //*gives Player a sidewards velocity
-      player.velocity.x = 3;
+      keys.right.pressed = true;
       break;
     //*chekcs if Space has been pressed
     case 32:
-      console.log("this is up");
       //*gives Player a upwards velocity
-      player.velocity.y -= 20;
+      player.velocity.y -= 17;
       break;
     //*chekcs if KeyS has been pressed
     case 83:
-      console.log("this is down");
       break;
   }
 });
 
-
 //*addEventListener to listen for a keyup event mainly KeyD, KeyA and Space
 window.addEventListener("keyup", ({ keyCode }) => {
-    switch (keyCode) {
-      //*chekcs if KeyA has been lifted
-      case 65:
-        console.log("this is left");
-         //*makes the Player stop moving
-        player.velocity.x = 0;
-        break;
-      //*chekcs if KeyD has been lifted
-      case 68:
-        console.log("this is right");
-        //*makes the Player stop moving
-        player.velocity.x = 0;
-        break;
-      //*chekcs if KeyS has been lifted
-      case 83:
-        console.log("this is down");
-        //*makes the Player stop moving
-        break;
-    }
-  });
+  switch (keyCode) {
+    //*chekcs if KeyA has been lifted
+    case 65:
+      //*makes the Player stop moving
+      keys.left.pressed = false;
+      break;
+    //*chekcs if KeyD has been lifted
+    case 68:
+      //*makes the Player stop moving
+      keys.right.pressed = false;
+      break;
+    //*chekcs if Space has been lifted
+    case 32:
+      //*makes the Player stop moving
+      player.velocity.y -= 0;
+      break;
+    //*chekcs if KeyS has been lifted
+    case 83:
+      //*makes the Player stop moving
+      break;
+  }
+});
