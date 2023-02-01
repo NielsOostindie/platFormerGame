@@ -4,11 +4,11 @@ const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
 //*set canvas to the whole page
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = 1920;
+canvas.height = 1080;
 
 //*sets gravity value to add overtime
-const gravity = 0.5;
+const gravity = 0.6;
 
 //*make a class for the player
 class Player {
@@ -34,7 +34,6 @@ class Player {
   }
   //*updates the Player every time
   update() {
-    this.draw();
     //!adds the gravity(velocity.y) the the y postion of the Player
     this.postion.y += this.velocity.y;
     this.postion.x += this.velocity.x;
@@ -52,11 +51,11 @@ class Platform {
     constructor() {
         this.postion = {
             x: 600,
-            y: 750
+            y: 800
         }
 
         this.width = 200;
-        this.height = 30;
+        this.height = 100;
     }
 
     draw() {
@@ -83,21 +82,22 @@ function animate() {
   //!clears the whole canvas
   c.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
+  player.draw();
   platform.draw();
 
   //?checks if Player has pressed the right or left key and
   //?move acordingly
   //*if the Player x axis has had the hav way mark stop moving
   if (keys.right.pressed && player.postion.x < window.innerWidth / 2) {
-    player.velocity.x = 5;
+    player.velocity.x = 8;
   } else if (keys.left.pressed && player.postion.x > 200) {
-    player.velocity.x = -5;
+    player.velocity.x = -8;
   } else {player.velocity.x = 0;
     if (keys.right.pressed){
-        platform.postion.x -= 5
+        platform.postion.x -= 8
     }
     if (keys.left.pressed){
-        platform.postion.x += 5
+        platform.postion.x += 8
     }
   }
 
@@ -106,6 +106,7 @@ function animate() {
      player.postion.y + player.height + player.velocity.y >=  platform.postion.y &&
      player.postion.x + player.width >= platform.postion.x &&  player.postion.x <= platform.postion.x + platform.width){
     player.velocity.y = 0
+    console.log("a")
   }
 
   if (platform.postion.y + platform.height >= player.postion.y &&
@@ -113,8 +114,23 @@ function animate() {
     platform.postion.x + platform.width >= player.postion.x &&
       platform.postion.x <= player.postion.x + player.width){
     player.velocity.y = 0
-    player.velocity.y = 1
+    player.velocity.y = 10
+    player.velocity.x = 0
+    player.velocity.x = 1
+
+    console.log('b')
   }
+
+  if (player.postion.x + player.height >= platform.postion.x &&
+    player.postion.x <= platform.postion.x &&
+    player.postion.y + player.height >= platform.postion.y &&
+    player.postion.y <= platform.postion.y + platform.height){
+    player.velocity.x = 0
+    player.velocity.x -= 1
+    player.velocity.y = 10
+    console.log('c')
+ }
+
 
 }
 
@@ -138,7 +154,7 @@ window.addEventListener("keydown", ({ keyCode }) => {
     //*chekcs if Space has been pressed
     case 32:
       //*gives Player a upwards velocity
-      player.velocity.y -= 17;
+      player.velocity.y -= 20;
       break;
     //*chekcs if KeyS has been pressed
     case 83:
