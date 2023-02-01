@@ -16,7 +16,7 @@ class Player {
     //!give the Player a x, y, width and height
     this.postion = {
       x: 250,
-      y: 100,
+      y: 1050,
     };
     //!Give the Player gravity
     this.velocity = {
@@ -25,11 +25,18 @@ class Player {
     };
     this.width = 30;
     this.height = 30;
+
+    this.isJumping = true;
   }
 
   //*draw the Player
   draw() {
     c.fillStyle = "red";
+    c.shadowColor = "red";
+    c.shadowBlur = 12;
+    c.shadowOffsetX = 0;
+    c.shadowOffsetY = 0;
+    c.fill();
     c.fillRect(this.postion.x, this.postion.y, this.width, this.height);
   }
   //*updates the Player every time
@@ -43,35 +50,49 @@ class Player {
       this.velocity.y += gravity;
     //*if the bottom of the Player hits the bottom of the Canvas,
     //*stop putting gravity on it
-    else this.velocity.y = 0;
+    else {
+      this.velocity.y = 0;
+      player.isJumping = false;
+    }
   }
 }
 
 class Platform {
-    constructor() {
-        this.postion = {
-            x: 600,
-            y: 800
-        }
+  constructor(x, y) {
+    this.postion = {
+      x,
+      y,
+    };
+    this.width = 250;
+    this.height = 40;
+  }
 
-        this.width = 200;
-        this.height = 100;
-    }
-
-    draw() {
-        c.fillStyle = 'blue';
-        c.fillRect(this.postion.x, this.postion.y, this.width, this.height);
-    }
+  draw() {
+    c.fillStyle = "blue";
+    c.shadowColor = " ";
+    c.shadowBlur = 0;
+    c.shadowOffsetX = 0;
+    c.shadowOffsetY = 0;
+    c.fill();
+    c.fillRect(this.postion.x, this.postion.y, this.width, this.height);
+  }
 }
 
 const player = new Player();
-const platform = new Platform();
+const platforms = [
+  new Platform(800, 600),
+  new Platform(500, 800),
+  new Platform(500, 380),
+];
 //!define the keys we want to monitor
 const keys = {
   right: {
     pressed: false,
   },
   left: {
+    pressed: false,
+  },
+  space: {
     pressed: false,
   },
 };
@@ -83,7 +104,9 @@ function animate() {
   c.clearRect(0, 0, canvas.width, canvas.height);
   player.update();
   player.draw();
-  platform.draw();
+  platforms.forEach((platform) => {
+    platform.draw();
+  });
 
   //?checks if Player has pressed the right or left key and
   //?move acordingly
@@ -92,46 +115,61 @@ function animate() {
     player.velocity.x = 8;
   } else if (keys.left.pressed && player.postion.x > 200) {
     player.velocity.x = -8;
-  } else {player.velocity.x = 0;
-    if (keys.right.pressed){
-        platform.postion.x -= 8
+  } else {
+    player.velocity.x = 0;
+    if (keys.right.pressed) {
+      platforms.forEach((platform) => {
+        platform.postion.x -= 8;
+      });
     }
-    if (keys.left.pressed){
-        platform.postion.x += 8
+    if (keys.left.pressed) {
+      platforms.forEach((platform) => {
+        platform.postion.x += 8;
+      });
     }
   }
-
-  //*platform collision detection
-  if (player.postion.y + player.height <= platform.postion.y &&
-     player.postion.y + player.height + player.velocity.y >=  platform.postion.y &&
-     player.postion.x + player.width >= platform.postion.x &&  player.postion.x <= platform.postion.x + platform.width){
-    player.velocity.y = 0
-    console.log("a")
+  if (keys.space.pressed && player.postion.y < 350) {
+    platforms.forEach((platform) => {
+      platform.postion.y += 20;
+    });
   }
 
-  if (platform.postion.y + platform.height >= player.postion.y &&
-    platform.postion.y <= player.postion.y + player.height  && 
-    platform.postion.x + platform.width >= player.postion.x &&
-      platform.postion.x <= player.postion.x + player.width){
-    player.velocity.y = 0
-    player.velocity.y = 10
-    player.velocity.x = 0
-    player.velocity.x = 1
+  platforms.forEach((platform) => {
+    //*platform collision detection
+    if (
+      player.postion.y + player.height <= platform.postion.y &&
+      player.postion.y + player.height + player.velocity.y >=
+        platform.postion.y &&
+      player.postion.x + player.width >= platform.postion.x &&
+      player.postion.x <= platform.postion.x + platform.width
+    ) {
+      player.isJumping = false;
+      player.velocity.y = 0;
+    }
 
-    console.log('b')
-  }
+    if (
+      platform.postion.y + platform.height >= player.postion.y &&
+      platform.postion.y <= player.postion.y + player.height &&
+      platform.postion.x + platform.width >= player.postion.x &&
+      platform.postion.x <= player.postion.x + player.width
+    ) {
+      player.velocity.y = 0;
+      player.velocity.y = 10;
+      player.velocity.x = 0;
+      player.velocity.x = 1;
+    }
 
-  if (player.postion.x + player.height >= platform.postion.x &&
-    player.postion.x <= platform.postion.x &&
-    player.postion.y + player.height >= platform.postion.y &&
-    player.postion.y <= platform.postion.y + platform.height){
-    player.velocity.x = 0
-    player.velocity.x -= 1
-    player.velocity.y = 10
-    console.log('c')
- }
-
-
+    if (
+      player.postion.x + player.height >= platform.postion.x &&
+      player.postion.x <= platform.postion.x &&
+      player.postion.y + player.height >= platform.postion.y &&
+      player.postion.y <= platform.postion.y + platform.height
+    ) {
+      player.velocity.x = 0;
+      player.velocity.x -= 1;
+      player.velocity.y = 10;
+    }
+  });
 }
 
 animate();
@@ -153,8 +191,12 @@ window.addEventListener("keydown", ({ keyCode }) => {
       break;
     //*chekcs if Space has been pressed
     case 32:
-      //*gives Player a upwards velocity
-      player.velocity.y -= 20;
+      keys.space.pressed = true;
+      if (!player.isJumping) {
+        player.velocity.y -= 20;
+        player.isJumping = true;
+      }
+
       break;
     //*chekcs if KeyS has been pressed
     case 83:
@@ -179,6 +221,7 @@ window.addEventListener("keyup", ({ keyCode }) => {
     case 32:
       //*makes the Player stop moving
       player.velocity.y -= 0;
+      keys.space.pressed = false;
       break;
     //*chekcs if KeyS has been lifted
     case 83:
